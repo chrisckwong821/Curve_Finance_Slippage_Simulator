@@ -52,7 +52,7 @@ python3 Swap.py -s 2
 # default
 python3 Swap.py -s 2 -a 1
 # specify swap size of 5%
-python3 Swap.py -s 2 -a 3
+python3 Swap.py -s 2 -a 5
 ```
 ![PoolBalance with 2% Slippage](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/2S%255S.png?raw=true)
 
