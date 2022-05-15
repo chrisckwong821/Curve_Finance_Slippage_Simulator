@@ -13,10 +13,17 @@ from simulation import Curve
 # 5000 for 3CRV
 As = [100, 200, 500, 1500, 2000, 5000]
 
+parser = argparse.ArgumentParser(description='-s slippage(%) / -p poolBalance(%)')
+parser.add_argument('-s', type=float, 
+                help='slippage(%)')
+parser.add_argument('-p', type=float,
+                help='PoolBalance(%)')
+parser.add_argument('-a', type=float, required=False,
+                help='percentageOfTradeSize')
+
 percentageOfEachTrade = 1
 # Total poolSize
 Dep = 10000000000
-swapAmount = Dep / (percentageOfEachTrade * 100)
 
 # set fee = 0 for stimulation purpose, set fee to 4000000 for prod
 fee = 0
@@ -44,12 +51,13 @@ def simulate(Curve, steps, swapAmount):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='-s slippage(%) / -p poolBalance(%)')
-    parser.add_argument('-s', type=float, 
-                    help='slippage(%)')
-    parser.add_argument('-p', type=float,
-                    help='PoolBalance(%)')
     args = parser.parse_args()
+    if args.a != None:
+        percentageOfEachTrade = args.a
+    else:
+        percentageOfEachTrade = 1
+    swapAmount = Dep * percentageOfEachTrade / 100
+
     if args.s and args.p == None:
         print(args.s)
         # slippage threshold(%) for poolBalance label on the plot

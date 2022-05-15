@@ -44,6 +44,19 @@ python3 Swap.py -s 2
 ![PoolBalance with 2% Slippage](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/2S%25.png?raw=true)
 
 
+### Swap / Withdraw Sizes
+```
+# Pre-set `1%` of poolSize for both swap and withdraw. 
+# Pass an optional argument -a to specify the size of the operation
+
+# default
+python3 Swap.py -s 2 -a 1
+# specify swap size of 5%
+python3 Swap.py -s 2 -a 3
+```
+![PoolBalance with 2% Slippage](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/2S%255S.png?raw=true)
+
+
 ## Note:
 
 1. Use simulation code from [Curve Finance](https://github.com/curvefi/curve-contract/blob/master/tests/simulation.py)
@@ -52,4 +65,3 @@ python3 Swap.py -s 2
 
 3. Assume no admin fee in the above illustration, modify `fee` in the script to `4000000` to resemble mainnet setting of 4 bps
 
-4. Pre-set `1%` of poolSize for both swap and withdraw. Modify `percentageOfEachTrade` to cutomize
