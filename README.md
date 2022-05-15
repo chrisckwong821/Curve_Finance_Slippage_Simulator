@@ -51,3 +51,5 @@ python3 Swap.py -s 2
 2. Use a simple 2-coins model. 
 
 3. Assume no admin fee in the above illustration, modify `fee` in the script to `4000000` to resemble mainnet setting of 4 bps
+
+4. Pre-set `1%` of poolSize for both swap and withdraw. Modify `percentageOfEachTrade` to cutomize
