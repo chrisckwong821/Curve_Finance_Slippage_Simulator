@@ -42,3 +42,12 @@ python3 Swap.py -s 2
 ```
 
 ![PoolBalance with 2% Slippage](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/2S%25.png?raw=true)
+
+
+## Note:
+
+1. Use simulation code from [Curve Finance](https://github.com/curvefi/curve-contract/blob/master/tests/pools/common/integration/test_curve.py)
+
+2. Use a simple 2-coins model. 
+
+3. Assume no admin fee in the above illustration, modify `fee` in the script to `4000000` to resemble mainnet setting of 4 bps
