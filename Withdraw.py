@@ -68,7 +68,7 @@ if __name__ == "__main__":
         ax = fig.add_subplot(1, 1, 1)
         ax.set_xlabel('Pool Balance(%)')  # Add an x-label to the axes.
         ax.set_ylabel('Slippage(%)')  # Add a y-label to the axes.
-        ax.set_title('Withdraw Slippage on Pool Ratio on Curve Stablepool')
+        ax.set_title('Withdraw Slippage of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
         print("Withdraw -----", withdrawAmount)
         thresholds = []
         
