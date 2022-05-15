@@ -14,7 +14,7 @@ pip install -r requirements.txt
 python3 Withdraw.py -p 80
 ```
 
-![Withdraw Slippage with 80% Pool Balance](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/80W%80.png?raw=true)
+![Withdraw Slippage with 80% Pool Balance](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/80W%25.png?raw=true)
 
 ### Simulate withdraw on a targeted Slippage(%)
 ```
@@ -22,7 +22,7 @@ python3 Withdraw.py -p 80
 python3 Withdraw.py -s 2
 ```
 
-![Withdraw PoolBalance with 2% Slippage](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/2W%80.png?raw=true)
+![Withdraw PoolBalance with 2% Slippage](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/2W%25.png?raw=true)
 
 `Swap` can be simulated in the same fashion using `Swap.py`
 
@@ -33,7 +33,7 @@ python3 Withdraw.py -s 2
 python3 Swap.py -p 80
 ```
 
-![Swap Slippage with 80% Pool Balance](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/80S%80.png?raw=true)
+![Swap Slippage with 80% Pool Balance](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/80S%25.png?raw=true)
 
 ### Simulate swap on a targeted Slippage(%)
 ```
@@ -41,4 +41,4 @@ python3 Swap.py -p 80
 python3 Swap.py -s 2
 ```
 
-![PoolBalance with 2% Slippage](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/2S%80.png?raw=true)
+![PoolBalance with 2% Slippage](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/2S%25.png?raw=true)
