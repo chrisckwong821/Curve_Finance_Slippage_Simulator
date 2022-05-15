@@ -14,7 +14,7 @@ pip install -r requirements.txt
 python3 Withdraw.py -p 80
 ```
 
-![Withdraw Slippage with 80% Pool Balance](resources/80W%.png)
+![Withdraw Slippage with 80% Pool Balance](./resources/80W%.png)
 
 ### Simulate withdraw on a targeted Slippage(%)
 ```
@@ -22,7 +22,7 @@ python3 Withdraw.py -p 80
 python3 Withdraw.py -s 2
 ```
 
-![Withdraw PoolBalance with 2% Slippage](resources/2W%.png)
+![Withdraw PoolBalance with 2% Slippage](./resources/2W%.png)
 
 `Swap` can be simulated in the same fashion using `Swap.py`
 
@@ -33,7 +33,7 @@ python3 Withdraw.py -s 2
 python3 Swap.py -p 80
 ```
 
-![Swap Slippage with 80% Pool Balance](resources/80S%.png)
+![Swap Slippage with 80% Pool Balance](./resources/80S%.png)
 
 ### Simulate swap on a targeted Slippage(%)
 ```
@@ -41,4 +41,4 @@ python3 Swap.py -p 80
 python3 Swap.py -s 2
 ```
 
-![PoolBalance with 2% Slippage](resources/2S%.png)
+![PoolBalance with 2% Slippage](./resources/2S%.png)
