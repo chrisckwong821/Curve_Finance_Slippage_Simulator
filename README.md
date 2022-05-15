@@ -46,12 +46,15 @@ python3 Swap.py -s 2
 
 ### Swap / Withdraw Sizes
 ```
-# Pre-set `1%` of poolSize for both swap and withdraw. 
+# Pre-set `1%` of pool TVL for both swap and withdraw. 
 # Pass an optional argument -a to specify the size of the operation
 
 # default
+python3 Swap.py -s 2
+# the above is the same as running
 python3 Swap.py -s 2 -a 1
-# specify swap size of 5%
+
+# specify swap size of 5% of total TVL
 python3 Swap.py -s 2 -a 5
 ```
 ![PoolBalance with 2% Slippage](https://github.com/chrisckwong821/Curve_Finance_Slippage_Simulator/blob/main/resources/2S%255S.png?raw=true)
