@@ -46,7 +46,7 @@ python3 Swap.py -s 2
 
 ## Note:
 
-1. Use simulation code from [Curve Finance](https://github.com/curvefi/curve-contract/blob/master/tests/pools/common/integration/test_curve.py)
+1. Use simulation code from [Curve Finance](https://github.com/curvefi/curve-contract/blob/master/tests/simulation.py)
 
 2. Use a simple 2-coins model. 
 

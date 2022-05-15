@@ -1,7 +1,7 @@
 import argparse
 import matplotlib.pyplot as plt
 
-# copy from Curve repo
+# reference implementation from Curve repo
 # https://github.com/curvefi/curve-contract/blob/master/tests/pools/common/integration/test_curve.py
 from simulation import Curve
 
