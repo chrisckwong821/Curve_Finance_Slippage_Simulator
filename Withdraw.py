@@ -18,6 +18,8 @@ parser.add_argument('-s', type=float,
                 help='slippage(%)')
 parser.add_argument('-p', type=float,
                 help='PoolBalance(%)')
+parser.add_argument('--bonus', default="False",
+                help='isBonus(%)')
 parser.add_argument('-a', type=float, required=False,
                 help='percentageOfTradeSize')
 
@@ -33,22 +35,27 @@ n = 2
 steps = [Dep/1000, 800]
 
 # steps = [tradeSize, number of trade]
-def simulate(Curve, steps, withdrawAmount):
+def simulate(Curve, steps, withdrawAmount, is_bonus):
     # tokens = Dep so it has 1LP = 1 Dep relationship
     tradeSize = steps[0]
     poolBalances = []
     slippages = []
-
     for i in range(steps[1]):
         old_balances = 100 * Curve.x[0] / sum(Curve.x)
-        output = Curve.calc_withdraw_one_coin(withdrawAmount, 1)
-        slippage = float(100 * (withdrawAmount - output) / withdrawAmount)
-        #print("withdraw amount: ", Curve.calc_withdraw_one_coin(withdrawAmount, 1), " at pool balance : ", old_balances)
-        #print("slippage : " , slippage, "  beginning_balances: ", old_balances)
+        if is_bonus == "False":
+            output = Curve.calc_withdraw_one_coin(withdrawAmount, 1)
+            slippage = float(100 * (withdrawAmount - output) / withdrawAmount)
+        elif is_bonus == "True":
+            output = Curve.calc_withdraw_one_coin(withdrawAmount, 0)
+            slippage = float(100 * (output - withdrawAmount) / withdrawAmount)
+        else:
+            print("--bonus is either False or True")
+            break
         poolBalances.append(old_balances)
         slippages.append(slippage)
         Curve.exchange(0,1, tradeSize)
-    # return the beginning pool %, the slippage(%)
+        
+    # return the beginning pool %, the sliipage(%)
     return poolBalances, slippages
 
 
@@ -59,75 +66,147 @@ if __name__ == "__main__":
     else:
         percentageOfEachTrade = 1
     withdrawAmount = Dep * percentageOfEachTrade / 100
+    
+    if args.bonus == "False":
+        if args.s and args.p == None:
+            
+            # slippage threshold(%) for poolBalance label on the plot
+            threshold = args.s
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1)
+            ax.set_xlabel('Pool Balance(%)')  # Add an x-label to the axes.
+            ax.set_ylabel('Slippage(%)')  # Add a y-label to the axes.
+            ax.set_title('Withdraw Slippage of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
+            print("Withdraw -----", withdrawAmount)
+            thresholds = []
+            
+            for i in As:
+                print("A : ", i)
+                curve = Curve(i, Dep,n, fee=fee, tokens=Dep)
+                x, y = simulate(curve, steps, withdrawAmount, "False")
+                ax.plot(x,y, label='A={}'.format(i))
 
-    if args.s and args.p == None:
-        print(args.s)
-        # slippage threshold(%) for poolBalance label on the plot
-        threshold = args.s
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-        ax.set_xlabel('Pool Balance(%)')  # Add an x-label to the axes.
-        ax.set_ylabel('Slippage(%)')  # Add a y-label to the axes.
-        ax.set_title('Withdraw Slippage of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
-        print("Withdraw -----", withdrawAmount)
-        thresholds = []
-        
-        for i in As:
-            print("A : ", i)
-            curve = Curve(i, Dep,n, fee=fee, tokens=Dep)
-            x, y = simulate(curve, steps, withdrawAmount)
-            ax.plot(x,y, label='A={}'.format(i))
+                # find the balance based on a threshold slippage (%)
+                index = [ n for n,i in enumerate(y) if i>threshold ][0]
 
-            # find the balance based on a threshold slippage (%)
-            index = [ n for n,i in enumerate(y) if i>threshold ][0]
+                thresholds.append(x[index])
+                print( "Pool Balance: ",x[index], " Based on slippage at {} %".format(threshold))
+            
+            AsText = ["A={}".format(A) for A in As]
+            thresholdsText = ['{}%'.format(format(t, ".1f")) for t in thresholds]
+            legend1 = plt.legend(AsText)
+            legend2 = plt.legend(thresholdsText, loc=1)
+            ax.add_artist(legend1)
+            ax.add_artist(legend2)
+            ax.axhline(y=threshold, ls='--', color='r', label="{}% sliipage".format(threshold))
+            ax.legend()
+            plt.show()
+        elif args.p and args.s == None:
+            
+            threshold = args.p
+            # poolBalance(%) threshold label on the plot for slippage
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1)
+            ax.set_xlabel('Pool Balance(%)')  # Add an x-label to the axes.
+            ax.set_ylabel('Slippage(%)')  # Add a y-label to the axes.
+            ax.set_title('Withdraw Slippage of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
+            print("Withdraw -----", withdrawAmount)
+            thresholds = []
+            for i in As:
+                print("A : ", i)
+                curve = Curve(i, Dep,n, fee=fee, tokens=Dep)
+                x, y = simulate(curve, steps, withdrawAmount, "False")
+                ax.plot(x,y, label='A={}'.format(i))
 
-            thresholds.append(x[index])
-            print( "Pool Balance: ",x[index], " Based on slippage at {} %".format(threshold))
-        
-        AsText = ["A={}".format(A) for A in As]
-        thresholdsText = ['{}%'.format(format(t, ".1f")) for t in thresholds]
-        legend1 = plt.legend(AsText)
-        legend2 = plt.legend(thresholdsText, loc=1)
-        ax.add_artist(legend1)
-        ax.add_artist(legend2)
-        ax.axhline(y=threshold, ls='--', color='r', label="{}% sliipage".format(threshold))
-        ax.legend()
-        plt.show()
-    elif args.p and args.s == None:
-        print(args.p)
-        threshold = args.p
-        # poolBalance(%) threshold label on the plot for slippage
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-        ax.set_xlabel('Pool Balance(%)')  # Add an x-label to the axes.
-        ax.set_ylabel('Slippage(%)')  # Add a y-label to the axes.
-        ax.set_title('Withdraw Slippage on Pool Ratio on Curve Stablepool')
-        print("Withdrwaw -----", withdrawAmount)
-        thresholds = []
-        for i in As:
-            print("A : ", i)
-            curve = Curve(i, Dep,n, fee=fee, tokens=Dep)
-            x, y = simulate(curve, steps, withdrawAmount)
-            ax.plot(x,y, label='A={}'.format(i))
+                # find the slippage (%) given a balance(%) threshold
+                index = [ n for n,i in enumerate(x) if i>threshold ][0]
 
-            # find the slippage (%) given a balance(%) threshold
-            index = [ n for n,i in enumerate(x) if i>threshold ][0]
+                thresholds.append(y[index])
+                print( "Slippage: ", y[index], " Based on poolBlaance at {} %".format(threshold))
+            
+            AsText = ["A={}".format(A) for A in As]
+            thresholdsText = ['{}%'.format(format(t, ".3f")) for t in thresholds]
+            legend1 = plt.legend(AsText)
+            legend2 = plt.legend(thresholdsText, loc=1)
+            ax.add_artist(legend1)
+            ax.add_artist(legend2)
+            ax.axvline(x=threshold, ls='--', color='r', label="{}% poolBalance".format(threshold))
+            #ax.axhline(y=threshold, ls='--', color='r', label="{}% sliipage".format(threshold))
+            ax.legend()
+            plt.show()
+        else:
+            print("Usage: python Withdraw.py [-s] slippage(%) OR [-p] poolBalance(%) | (optional) --bonus [-a] TVL(%)")
+    elif args.bonus == "True":
+        if args.s and args.p == None:
+            
+            # slippage threshold(%) for poolBalance label on the plot
+            threshold = args.s
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1)
+            ax.set_xlabel('Pool Balance(%)')  # Add an x-label to the axes.
+            ax.set_ylabel('Bonus(%)')  # Add a y-label to the axes.
+            ax.set_title('Withdraw Bonus of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
+            print("Withdraw -----", withdrawAmount)
+            thresholds = []
+            
+            for i in As:
+                print("A : ", i)
+                curve = Curve(i, Dep,n, fee=fee, tokens=Dep)
+                x, y = simulate(curve, steps, withdrawAmount, "True")
+                ax.plot(x,y, label='A={}'.format(i))
 
-            thresholds.append(y[index])
-            print( "Slippage: ", y[index], " Based on poolBlaance at {} %".format(threshold))
-        
-        AsText = ["A={}".format(A) for A in As]
-        thresholdsText = ['{}%'.format(format(t, ".3f")) for t in thresholds]
-        legend1 = plt.legend(AsText)
-        legend2 = plt.legend(thresholdsText, loc=1)
-        ax.add_artist(legend1)
-        ax.add_artist(legend2)
-        ax.axvline(x=threshold, ls='--', color='r', label="{}% poolBalance".format(threshold))
-        #ax.axhline(y=threshold, ls='--', color='r', label="{}% sliipage".format(threshold))
-        ax.legend()
-        plt.show()
+                # find the balance based on a threshold slippage (%)
+                index = [ n for n,i in enumerate(y) if i>threshold ][0]
+
+                thresholds.append(x[index])
+                print( "Pool Balance: ",x[index], " Based on Bonus at {} %".format(threshold))
+            
+            AsText = ["A={}".format(A) for A in As]
+            thresholdsText = ['{}%'.format(format(t, ".1f")) for t in thresholds]
+            legend1 = plt.legend(AsText)
+            legend2 = plt.legend(thresholdsText, loc=1)
+            ax.add_artist(legend1)
+            ax.add_artist(legend2)
+            ax.axhline(y=threshold, ls='--', color='r', label="{}% bonus".format(threshold))
+            ax.legend()
+            plt.show()
+        elif args.p and args.s == None:
+            
+            threshold = args.p
+            # poolBalance(%) threshold label on the plot for slippage
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1)
+            ax.set_xlabel('Pool Balance(%)')  # Add an x-label to the axes.
+            ax.set_ylabel('Bonus(%)')  # Add a y-label to the axes.
+            ax.set_title('Withdraw Bonus of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
+            print("Withdraw -----", withdrawAmount)
+            thresholds = []
+            for i in As:
+                print("A : ", i)
+                curve = Curve(i, Dep,n, fee=fee, tokens=Dep)
+                x, y = simulate(curve, steps, withdrawAmount, "True")
+                ax.plot(x,y, label='A={}'.format(i))
+
+                # find the slippage (%) given a balance(%) threshold
+                index = [ n for n,i in enumerate(x) if i>threshold ][0]
+
+                thresholds.append(y[index])
+                print( "Bonus: ", y[index], " Based on poolBlaance at {} %".format(threshold))
+            
+            AsText = ["A={}".format(A) for A in As]
+            thresholdsText = ['{}%'.format(format(t, ".3f")) for t in thresholds]
+            legend1 = plt.legend(AsText)
+            legend2 = plt.legend(thresholdsText, loc=1)
+            ax.add_artist(legend1)
+            ax.add_artist(legend2)
+            ax.axvline(x=threshold, ls='--', color='r', label="{}% poolBalance".format(threshold))
+            #ax.axhline(y=threshold, ls='--', color='r', label="{}% sliipage".format(threshold))
+            ax.legend()
+            plt.show()
+        else:
+            print("Usage: python Withdraw.py [-s] slippage(%) OR [-p] poolBalance(%) | (optional) --bonus [-a] TVL(%)")
     else:
-        print("Usage: python Withdraw.py [-s] slippage(%) OR [-p] poolBalance(%)")
+        print("--bonus is either False or True")
     
     
     

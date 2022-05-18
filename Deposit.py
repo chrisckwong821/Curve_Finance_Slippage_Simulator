@@ -35,7 +35,7 @@ n = 2
 steps = [Dep/1000, 800]
 
 # steps = [tradeSize, number of trade]
-def simulate(Curve, steps, swapAmount, is_bonus):
+def simulate(Curve, steps, depositAmount, is_bonus):
     # tokens = Dep so it has 1LP = 1 Dep relationship
     tradeSize = steps[0]
     poolBalances = []
@@ -43,11 +43,11 @@ def simulate(Curve, steps, swapAmount, is_bonus):
     for i in range(steps[1]):
         old_balances = 100 * Curve.x[0] / sum(Curve.x)
         if is_bonus == "False":
-            output = Curve.dyWfee(0, 1, swapAmount)
-            slippage = float(100 * (swapAmount - output) / swapAmount)
+            output = Curve.calc_add_liquidity(depositAmount, 0)
+            slippage = float(100 * (depositAmount - output) / depositAmount)
         elif is_bonus == "True":
-            output = Curve.dyWfee(1, 0, swapAmount)
-            slippage = float(100 * (output - swapAmount) / swapAmount)
+            output = Curve.calc_add_liquidity(depositAmount, 1)
+            slippage = float(100 * (output - depositAmount) / depositAmount)
         else:
             print("--bonus is either False or True")
             break
@@ -65,7 +65,7 @@ if __name__ == "__main__":
         percentageOfEachTrade = args.a
     else:
         percentageOfEachTrade = 1
-    swapAmount = Dep * percentageOfEachTrade / 100
+    depositAmount = Dep * percentageOfEachTrade / 100
     
     if args.bonus == "False":
         if args.s and args.p == None:
@@ -76,14 +76,14 @@ if __name__ == "__main__":
             ax = fig.add_subplot(1, 1, 1)
             ax.set_xlabel('Pool Balance(%)')  # Add an x-label to the axes.
             ax.set_ylabel('Slippage(%)')  # Add a y-label to the axes.
-            ax.set_title('Swap Slippage of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
-            print("Swap -----", swapAmount)
+            ax.set_title('Deposit Slippage of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
+            print("Deposit -----", depositAmount)
             thresholds = []
             
             for i in As:
                 print("A : ", i)
                 curve = Curve(i, Dep,n, fee=fee, tokens=Dep)
-                x, y = simulate(curve, steps, swapAmount, "False")
+                x, y = simulate(curve, steps, depositAmount, "False")
                 ax.plot(x,y, label='A={}'.format(i))
 
                 # find the balance based on a threshold slippage (%)
@@ -109,13 +109,13 @@ if __name__ == "__main__":
             ax = fig.add_subplot(1, 1, 1)
             ax.set_xlabel('Pool Balance(%)')  # Add an x-label to the axes.
             ax.set_ylabel('Slippage(%)')  # Add a y-label to the axes.
-            ax.set_title('Swap Slippage of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
-            print("Swap -----", swapAmount)
+            ax.set_title('Deposit Slippage of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
+            print("Deposit -----", depositAmount)
             thresholds = []
             for i in As:
                 print("A : ", i)
                 curve = Curve(i, Dep,n, fee=fee, tokens=Dep)
-                x, y = simulate(curve, steps, swapAmount, "False")
+                x, y = simulate(curve, steps, depositAmount, "False")
                 ax.plot(x,y, label='A={}'.format(i))
 
                 # find the slippage (%) given a balance(%) threshold
@@ -135,7 +135,7 @@ if __name__ == "__main__":
             ax.legend()
             plt.show()
         else:
-            print("Usage: python Swap.py [-s] slippage(%) OR [-p] poolBalance(%) | (optional) --bonus [-a] TVL(%)")
+            print("Usage: python Deposit.py [-s] slippage(%) OR [-p] poolBalance(%) | (optional) --bonus [-a] TVL(%)")
     elif args.bonus == "True":
         if args.s and args.p == None:
             
@@ -145,14 +145,14 @@ if __name__ == "__main__":
             ax = fig.add_subplot(1, 1, 1)
             ax.set_xlabel('Pool Balance(%)')  # Add an x-label to the axes.
             ax.set_ylabel('Bonus(%)')  # Add a y-label to the axes.
-            ax.set_title('Swap Bonus of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
-            print("Swap -----", swapAmount)
+            ax.set_title('Deposit Bonus of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
+            print("Deposit -----", depositAmount)
             thresholds = []
             
             for i in As:
                 print("A : ", i)
                 curve = Curve(i, Dep,n, fee=fee, tokens=Dep)
-                x, y = simulate(curve, steps, swapAmount, "True")
+                x, y = simulate(curve, steps, depositAmount, "True")
                 ax.plot(x,y, label='A={}'.format(i))
 
                 # find the balance based on a threshold slippage (%)
@@ -171,20 +171,20 @@ if __name__ == "__main__":
             ax.legend()
             plt.show()
         elif args.p and args.s == None:
-            
+            print(args.p)
             threshold = args.p
             # poolBalance(%) threshold label on the plot for slippage
             fig = plt.figure()
             ax = fig.add_subplot(1, 1, 1)
             ax.set_xlabel('Pool Balance(%)')  # Add an x-label to the axes.
             ax.set_ylabel('Bonus(%)')  # Add a y-label to the axes.
-            ax.set_title('Swap Bonus of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
-            print("Swap -----", swapAmount)
+            ax.set_title('Deposit Bonus of Size({}% TVL) on Pool Ratio on Curve Stablepool'.format(percentageOfEachTrade))
+            print("Deposit -----", depositAmount)
             thresholds = []
             for i in As:
                 print("A : ", i)
                 curve = Curve(i, Dep,n, fee=fee, tokens=Dep)
-                x, y = simulate(curve, steps, swapAmount, "True")
+                x, y = simulate(curve, steps, depositAmount, "True")
                 ax.plot(x,y, label='A={}'.format(i))
 
                 # find the slippage (%) given a balance(%) threshold
@@ -204,7 +204,7 @@ if __name__ == "__main__":
             ax.legend()
             plt.show()
         else:
-            print("Usage: python Swap.py [-s] slippage(%) OR [-p] poolBalance(%) | (optional) --bonus [-a] TVL(%)")
+            print("Usage: python Deposit.py [-s] slippage(%) OR [-p] poolBalance(%) | (optional) --bonus [-a] TVL(%)")
     else:
         print("--bonus is either False or True")
     
