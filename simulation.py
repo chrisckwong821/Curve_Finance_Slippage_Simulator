@@ -107,8 +107,12 @@ class Curve:
         # dx and dy are in underlying units
         xp = self.xp()
         return xp[j] - self.y(i, j, xp[i] + dx)
-
-    # dy - fee
+    # find swapped amount with acconting fee
+    def dyWfee(self, i, j, dx):
+        xp = self.xp()
+        dy = xp[j] - self.y(i, j, xp[i] + dx)
+        return dy - dy * self.fee // 10 ** 10
+    
     def exchange(self, i, j, dx):
         xp = self.xp()
         x = xp[i] + dx
@@ -149,7 +153,7 @@ class Curve:
     def calc_withdraw_one_coin(self, token_amount, i):
         xp = self.xp()
         if self.fee:
-            fee = self.fee - self.fee * xp[i] // sum(xp) + 5 * 10 ** 5
+            fee = self.fee - self.fee * xp[i] // sum(xp)
         else:
             fee = 0
 
@@ -158,3 +162,49 @@ class Curve:
         dy = xp[i] - self.y_D(i, D1)
 
         return dy - dy * fee // 10 ** 10
+
+    def get_virtual_price(self):
+        return D / self.tokens
+    
+    def D_withBalance(self, new_balance):
+        """
+        D invariant calculation in non-overflowing integer operations
+        iteratively
+        A * sum(x_i) * n**n + D = A * D * n**n + D**(n+1) / (n**n * prod(x_i))
+        Converging solution:
+        D[j+1] = (A * n**n * sum(x_i) - D[j]**(n+1) / (n**n prod(x_i))) / (A * n**n - 1)
+        """
+        Dprev = 0
+        xp = new_balance
+        S = sum(xp)
+        D = S
+        Ann = self.A * self.n
+        while abs(D - Dprev) > 1:
+            D_P = D
+            for x in xp:
+                D_P = D_P * D // (self.n * x)
+            Dprev = D
+            D = (Ann * S + D_P * self.n) * D // ((Ann - 1) * D + (self.n + 1) * D_P)
+
+        return D
+
+    # add coin i with amount, return lp_amount
+    def calc_add_liquidity(self, token_amount, i):
+        old_balance = self.xp()
+        D0 = self.D()
+        
+        new_balance = old_balance
+        new_balance[i] += token_amount
+        D1 = self.D_withBalance(new_balance)
+
+        assert D1 > D0
+        total_supply = self.tokens
+        if self.fee:
+            fee = self.fee - self.fee * old_balance[i] // sum(old_balance)
+        else:
+            fee = 0
+
+        new_balance[i] -= fee // 10 ** 10
+        D2 = self.D_withBalance(new_balance)
+        mint_amount = total_supply * (D2 - D0) / D0
+        return mint_amount
