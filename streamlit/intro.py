@@ -32,6 +32,7 @@ st.markdown(
     ### Contributor
 
     Core Simulation Logic: [GeekRunner](https://twitter.com/0xGeekRunner)
+    
     Streamlit: [VJiang](https://twitter.com/vjiang_)
 
 """
