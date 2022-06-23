@@ -1,4 +1,8 @@
 # Curve_Finance_Slippage_Simulator
+
+Hosted web service [here](https://chrisckwong821-curve-finance-slippage-sim-streamlitintro-neks3g.streamlitapp.com/) kindly created by [Vhjiang](https://github.com/vhjiang)
+
+
 simulate slippage & bonus for pool of various Amplifier(s), based on a targeted slippage(%) or a poolBalance(%) with custom size as a percentage of pool Total Value Locked (TVL).
 
 Scripts for **Swap**, **Withdrawal** and **Deposit**
@@ -142,3 +146,9 @@ python3 Swap.py -s 2 -a 5
 
 3. Assume no admin fee in the above illustration, modify `fee` in the script to `4000000` to resemble mainnet setting of 4 bps
 
+
+## Contributor
+
+Core Simulation Logic: [GeekRunner](https://twitter.com/0xGeekRunner)
+
+Streamlit: [VJiang](https://twitter.com/vjiang_)

@@ -29,6 +29,10 @@ st.markdown(
     2. Use a simple 2-coins model. 
     3. Assume no admin fee in the above illustration, modify `fee` in the script to `4000000` to resemble mainnet setting of 4 bps
 
+    ### Contributor
+
+    Core Simulation Logic: [GeekRunner](https://twitter.com/0xGeekRunner)
+    Streamlit: [VJiang](https://twitter.com/vjiang_)
 
 """
 )
